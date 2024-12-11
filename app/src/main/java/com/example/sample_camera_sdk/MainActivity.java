@@ -6,7 +6,8 @@ import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.mynew.secure.CameraActivity;
+import com.mynew.secure.AchalaSecure;
+import com.mynew.secure.AchalaSecureImpl;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -18,8 +19,11 @@ public class MainActivity extends AppCompatActivity {
 
         Button openCameraButton = findViewById(R.id.openCameraButton);
         openCameraButton.setOnClickListener(v -> {
-            Intent intent = new Intent(this, CameraActivity.class);
-            startActivity(intent);
+            // Create an instance and call the method
+            AchalaSecure achalaSecure = new AchalaSecureImpl(MainActivity.this);
+            achalaSecure.enrollFace(100, "123");
+//            Intent intent = new Intent(this, CameraActivity.class);
+//            startActivity(intent);
         });
     }
 }

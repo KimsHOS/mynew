@@ -5,8 +5,13 @@
     <uses-feature android:name="android.hardware.camera" />
 
     <application>
-        <activity
+       <!-- <activity
             android:name="com.mynew.secure.CameraActivity"
+            android:exported="false"
+            android:theme="@style/Theme.MaterialComponents.DayNight.NoActionBar">
+        </activity>-->
+        <activity
+            android:name="com.mynew.secure.activity.CameraActivity"
             android:exported="false"
             android:theme="@style/Theme.MaterialComponents.DayNight.NoActionBar">
         </activity>
