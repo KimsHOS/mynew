@@ -38,7 +38,7 @@ afterEvaluate {
     publishing {
         publications {
             release(MavenPublication) {
-                groupId = 'com.github.YourGitHubUsername'
+                groupId = 'com.github.KimsHOS'
                 artifactId = 'secure-camera'
                 version = '1.0.0'
                 
@@ -48,7 +48,7 @@ afterEvaluate {
                 pom {
                     name = 'Secure Camera SDK'
                     description = 'Android library for secure camera integration with face detection'
-                    url = 'https://github.com/YourGitHubUsername/sample_camera_sdk'
+                    url = 'https://github.com/KimsHOS/sample_camera_sdk'
                     licenses {
                         license {
                             name = 'The Apache License, Version 2.0'
