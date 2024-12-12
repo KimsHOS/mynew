@@ -1,132 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:background="#FFFFFF"
+    android:fitsSystemWindows="false">
 
+    <!-- Full Screen Camera Preview -->
     <androidx.camera.view.PreviewView
         android:id="@+id/preview_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
-    <!-- Gradient overlay on top of PreviewView -->
-    <ImageButton
-        android:layout_width="50dp"
-        android:layout_marginTop="?actionBarSize"
-        android:layout_marginLeft="20dp"
-        android:id="@+id/close_camera"
-        android:background="#00000000"
-        android:layout_height="50dp"/>
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="false" />
+
+    <!-- Top Bar -->
+    <LinearLayout
+        android:id="@+id/header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- Status Bar Height Padding -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="24dp" />
+
+        <!-- Header Content -->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:paddingHorizontal="20dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:text="Face Authentication"
+                android:textColor="#FFFFFF"
+                android:textSize="20sp"
+                android:visibility="gone"
+                android:letterSpacing="0.05"
+                android:fontFamily="sans-serif-medium" />
+
+            <ImageButton
+                android:id="@+id/close_camera"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+
+                android:background="@drawable/modern_button_bg"
+                android:contentDescription="@string/close_camera_description"
+                android:padding="10dp"
+                android:src="@drawable/ic_close" />
+        </RelativeLayout>
+    </LinearLayout>
+
+    <!-- Face Guide Circle -->
     <ImageView
-        android:layout_width="100dp"
-        android:layout_alignParentEnd="true"
-        android:layout_height="100dp"
+        android:layout_width="280dp"
+        android:layout_height="280dp"
         android:visibility="gone"
-        android:fitsSystemWindows="true"
-        android:id="@+id/actual_image_preview_bitmap"
-        />
+        android:layout_centerInParent="true"
+        android:src="@drawable/white_face_guide" />
 
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="200dp"
-        android:layout_alignParentBottom="true"
-        android:scaleType="fitXY" />
-    <!--    <ImageView-->
-    <!--        android:layout_width="match_parent"-->
-    <!--        android:layout_height="50dp"-->
-    <!--        android:src="@drawable/gradient_overlay_top"-->
-    <!--        android:scaleType="fitXY" />-->
+    <!-- User Instructions -->
     <TextView
-        android:layout_width="match_parent"
-        android:gravity="center|top"
-        android:textSize="20sp"
-        android:id="@+id/live_detection"
-        android:textColor="#CD5B55"
-        android:layout_height="match_parent"/>
-    <TextView
-
-        android:layout_width="match_parent"
-        android:textSize="30sp"
         android:id="@+id/to_user"
-        android:layout_marginTop="100dp"
-        android:layout_marginLeft="50dp"
-        android:layout_centerVertical="true"
-        android:layout_marginRight="50dp"
-        android:textStyle="bold"
-        android:textColor="#ffffff"
-        android:gravity="center"
-        android:layout_height="wrap_content"
-        android:text="Please look in to the camera"
-        />
-    <TextView
-
-        android:layout_width="match_parent"
-        android:textSize="12sp"
-        android:id="@+id/to_user1"
-        android:visibility="gone"
-        android:layout_below="@id/to_user"
-        android:layout_marginTop="100dp"
-        android:layout_marginLeft="50dp"
-        android:layout_centerVertical="true"
-        android:layout_marginRight="50dp"
-        android:textStyle="bold"
-        android:textColor="#ffffff"
-        android:gravity="center"
-        android:layout_height="wrap_content"
-        android:text="Please look in to the camera"
-        />
-
-<!--    <com.example.faceauthentication.utils.FaceBoxOverlay-->
-<!--        android:id="@+id/face_box_overlay"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="match_parent"-->
-<!--        android:background="@android:color/transparent"/>-->
-    <ImageView
         android:layout_width="wrap_content"
-        android:id="@+id/face_mask_image"
-        android:layout_above="@id/version_number_layout"
-        android:background="@drawable/oval_gradient"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:src="@drawable/face"
-        android:visibility="gone"
-        android:textColor="#ffffff"/>
-    <TextView
-        android:layout_below="@id/face_mask_image"
-        android:layout_width="match_parent"
-        android:gravity="center"
-        android:visibility="gone"
-        android:id="@+id/spoofing_detected"
-        android:textColor="#ffffff"
-        android:textSize="20sp"
-        android:fontFamily="sans-serif-black"
-        android:layout_height="wrap_content"
-        android:text="Spoofing Detected"
-        />
-    <LinearLayout
-        android:id="@+id/version_number_layout"
-        android:layout_width="match_parent"
-        android:weightSum="2"
-        android:layout_margin="?actionBarSize"
-        android:orientation="horizontal"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true">
-        <TextView
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:gravity="left"
-            android:textColor="#ffffff"
-            android:layout_alignParentBottom="true"
-            android:text="AchalaSecure"
-            android:layout_height="wrap_content"
-            />
-        <TextView
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:gravity="right"
-            android:textColor="#ffffff"
-            android:layout_alignParentBottom="true"
-            android:text="0.0.1"
-            android:layout_height="wrap_content"
-            />
+        android:layout_above="@id/bottom_container"
+        android:layout_marginBottom="48dp"
+        android:text="Please look into the camera"
+        android:textColor="#FFFFFF"
+        android:textSize="22sp"
+        android:fontFamily="sans-serif-medium"
+        android:letterSpacing="0.02"
+        android:shadowColor="#C3000000"
+        android:shadowDx="0"
+        android:shadowDy="2"
+        android:shadowRadius="4" />
 
+    <!-- Bottom Container with Black Background -->
+    <LinearLayout
+        android:id="@+id/bottom_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="#3BFBFBFB"
+        android:orientation="horizontal"
+        android:padding="16dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="AchalaSecure"
+            android:textColor="#ffffff"
+            android:textSize="16sp"
+            android:fontFamily="sans-serif-medium" />
+
+        <TextView
+            android:id="@+id/version_info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="v0.0.1"
+            android:textColor="#ffffff"
+            android:textSize="16sp"
+            android:fontFamily="sans-serif-medium" />
     </LinearLayout>
+
+    <!-- Live Detection Status (Hidden by default) -->
+    <TextView
+        android:id="@+id/live_detection"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:layout_centerHorizontal="true"
+        android:layout_above="@id/to_user"
+        android:layout_marginBottom="8dp"
+        android:textColor="#69F0AE"
+        android:textSize="16sp"
+        android:fontFamily="sans-serif-medium" />
+
 </RelativeLayout>

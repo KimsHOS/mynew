@@ -113,14 +113,13 @@ public class CameraActivity extends AppCompatActivity {
 //    "smile", "blink",
     HashMap<String, Boolean> detectionResults = new HashMap<>();
     private int currentIndex = 0;
-    private TextView instructionToUser,instructionToUser1, liveDetection, spoofingDetected;
+    private TextView instructionToUser, liveDetection;
     private String userGid = "Verify_User";
     private Bitmap imageFromThePath;
     private boolean isRegistration;
     private Bitmap originalBitmap;
     private FaceAntiSpoofing fas;
     private MobileFaceNet mfn;
-    private ImageView faceMaskImage;
     private ImageButton closeCamera;
     private ObjectAnimator animator;
     private FaceDetectorOptions realTimeOpts;
@@ -157,10 +156,9 @@ public class CameraActivity extends AppCompatActivity {
 
         previewView = findViewById(R.id.preview_view);
         instructionToUser = findViewById(R.id.to_user);
-        instructionToUser1 = findViewById(R.id.to_user1);
+
         liveDetection = findViewById(R.id.live_detection);
-        spoofingDetected = findViewById(R.id.spoofing_detected);
-        faceMaskImage = findViewById(R.id.face_mask_image);
+
         previewView.setScaleX(-1);
         closeCamera = findViewById(R.id.close_camera);
         cameraExecutor = Executors.newSingleThreadExecutor();
@@ -204,6 +202,29 @@ public class CameraActivity extends AppCompatActivity {
                 startCamera();
             }
         });
+
+        // Hide both system UI and navigation bar
+        getWindow().getDecorView().setSystemUiVisibility(
+                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                | View.SYSTEM_UI_FLAG_FULLSCREEN
+                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        if (hasFocus) {
+            getWindow().getDecorView().setSystemUiVisibility(
+                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                    | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                    | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                    | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                    | View.SYSTEM_UI_FLAG_FULLSCREEN
+                    | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+        }
     }
 
     private void initAntiSpoofing() {
@@ -376,7 +397,6 @@ public class CameraActivity extends AppCompatActivity {
                                         } else {
                                             if (checkQualityWithModel(cropFaces(originalBitmap, faces.get(0)))){
                                                 if (detectEyesOpen(faces.get(0))){
-                                                    //if(isFaceInProperLighting(convertBitmapToMat(originalBitmap),instructionToUser1))
                                                     if(checkImageStability(faces.get(0)) || !isRegistration)
                                                         compareFaces(faces, originalBitmap);
                                                 } else
@@ -482,14 +502,11 @@ public class CameraActivity extends AppCompatActivity {
             text = " liveness detection：" + score1;
             Log.d("TAG", "checkQualityWithModel: "+text);
             if (score1 < FaceAntiSpoofing.THRESHOLD) {
-                if (animator != null)
-                    stopBlinking(spoofingDetected);
-                text = text + "，" + "True";
+
                 // resultTextView.setTextColor(getResources().getColor(android.R.color.holo_green_light));
                 return true;
             } else {
                 text = text + "，" + "False";
-                startBlinking(spoofingDetected);
                 //resultTextView.setTextColor(getResources().getColor(android.R.color.holo_red_light));
                 return false;
             }
@@ -737,65 +754,6 @@ public class CameraActivity extends AppCompatActivity {
 
     private static final double BRIGHTNESS_THRESHOLD = 100.0; // Example threshold
     private static final double SATURATION_THRESHOLD = 80.0;  // Example threshold
-
-    public static boolean isFaceInProperLighting(Mat faceImage, TextView instructionToUser1) {
-        // Check if the image is empty
-        if (faceImage.empty()) {
-            Log.d("TAG", "Input face image is empty.");
-            return false; // or handle as needed
-        }
-
-        // Convert the image from BGR to HSV color space
-        Mat hsvImage = new Mat();
-        Imgproc.cvtColor(faceImage, hsvImage, Imgproc.COLOR_BGR2HSV);
-
-        // Split the HSV image into its channels
-        List<Mat> hsvChannels = new ArrayList<>();
-        Core.split(hsvImage, hsvChannels);
-
-        Mat valueChannel = hsvChannels.get(2); // V channel
-        Mat saturationChannel = hsvChannels.get(1); // S channel
-
-        // Calculate the histogram for the Value channel
-        Mat valueHist = new Mat();
-        int histSize = 256; // Size of histogram
-        float[] range = {0, 256};
-        Imgproc.calcHist(Arrays.asList(valueChannel), new MatOfInt(0), new Mat(), valueHist, new MatOfInt(histSize), new MatOfFloat(range));
-
-        // Calculate the histogram for the Saturation channel
-        Mat saturationHist = new Mat();
-        Imgproc.calcHist(Arrays.asList(saturationChannel), new MatOfInt(0), new Mat(), saturationHist, new MatOfInt(histSize), new MatOfFloat(range));
-
-        // Analyze histogram data to check lighting conditions
-        double valueSum = Core.sumElems(valueHist).val[0];
-        double saturationSum = Core.sumElems(saturationHist).val[0];
-
-        // To avoid division by zero, check if the image has any non-zero pixels
-        double totalPixels = faceImage.total();
-        double nonZeroPixels = Core.countNonZero(valueChannel); // Count non-zero pixels
-
-        // Avoid division by zero
-        double avgBrightness = nonZeroPixels > 0 ? valueSum / nonZeroPixels : 0;
-        double avgSaturation = saturationSum / totalPixels;
-
-        // Debugging logs to check histogram values
-        Log.d("TAG", "Value Histogram: " + Arrays.toString(valueHist.get(0, 0)));
-        Log.d("TAG", "Saturation Histogram: " + Arrays.toString(saturationHist.get(0, 0)));
-        Log.d("TAG", "Average Brightness: " + avgBrightness);
-        Log.d("TAG", "Average Saturation: " + avgSaturation);
-
-        // Update instructionToUser1 with histogram and average values
-        instructionToUser1.setText("Value Histogram: " + Arrays.toString(valueHist.get(0, 0)) +
-                "\nSaturation Histogram: " + Arrays.toString(saturationHist.get(0, 0)) +
-                "\nAverage Brightness: " + avgBrightness +
-                "\nAverage Saturation: " + avgSaturation);
-        instructionToUser1.setVisibility(View.VISIBLE);
-
-        // Determine if the lighting is proper
-        return avgBrightness > BRIGHTNESS_THRESHOLD && avgSaturation > SATURATION_THRESHOLD;
-    }
-
-
 
     private void finishCameraLauncher(String result) {
         Intent resultIntent = new Intent();
@@ -1320,8 +1278,6 @@ public class CameraActivity extends AppCompatActivity {
 
     private void startBlinking(TextView view) {
         view.setVisibility(View.VISIBLE);
-        faceMaskImage.setVisibility(View.VISIBLE);
-
         view.setTextColor(Color.parseColor("#174EA6"));
         animator = ObjectAnimator.ofFloat(view, "alpha", 1f, 0f, 1f);
         animator.setDuration(1000); // Duration for one cycle of blink (1 second)
@@ -1332,7 +1288,7 @@ public class CameraActivity extends AppCompatActivity {
 
     private void stopBlinking(TextView view) {
         view.setVisibility(View.GONE);
-        faceMaskImage.setVisibility(View.GONE);
+
         view.setTextColor(Color.parseColor("#174EA6"));
         animator.cancel();
         animator = null;

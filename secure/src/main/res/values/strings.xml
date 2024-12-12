@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">faceAuthentication</string>
+    <string name="close_camera_description">Close Camera</string>
 </resources>
