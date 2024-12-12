@@ -23,7 +23,7 @@
         <!-- Status Bar Height Padding -->
         <View
             android:layout_width="match_parent"
-            android:layout_height="24dp" />
+            android:layout_height="48dp" />
 
         <!-- Header Content -->
         <RelativeLayout
