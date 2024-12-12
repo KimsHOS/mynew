@@ -4,8 +4,9 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-feature android:name="android.hardware.camera" />
 
-    <application>
-       <!-- <activity
+    <application
+        android:theme="@style/Theme.TransparentSystemBars">
+        <!-- <activity
             android:name="com.mynew.secure.CameraActivity"
             android:exported="false"
             android:theme="@style/Theme.MaterialComponents.DayNight.NoActionBar">
