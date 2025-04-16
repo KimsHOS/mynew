@@ -177,7 +177,7 @@ public class Comparison {
                                 ? names[avgScores.indexOf(avgScores.stream().max(Double::compare).orElse(0.0))]
                                 : "Unknown";
                         Log.d("cosine","method");
-                        if(avgScores.get(0)<0.7){
+                        if(avgScores.get(0)<0.8){
                             bestScoreUserName = "Unknown";
                         }
                     } else {
