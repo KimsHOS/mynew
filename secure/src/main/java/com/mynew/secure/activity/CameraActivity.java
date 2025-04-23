@@ -562,7 +562,7 @@ public class CameraActivity extends AppCompatActivity {
 
 
                 boolean isMobileFaceNet = false;
-                if(!isMobileFaceNet){
+                if(true){
                     if (isRegistration) {
                         //saveBitmap(originalBitmap);
                         new Comparison(this, originalBitmap, facesList, achalaSecureCallback, model);
