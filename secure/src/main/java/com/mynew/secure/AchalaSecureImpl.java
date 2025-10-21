@@ -99,4 +99,42 @@ public class AchalaSecureImpl implements AchalaSecure {
     public void setAuthenticateFaceByBitmap(Bitmap bitmap) {
         this.authFaceByBitmap = bitmap;
     }
+
+
+
+
+    @Override
+    public void liveNessDetection(int ACHALA_SECURE_REQUEST_CODE,String id) {
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                // This method runs on the main thread, so no need for a new thread
+                if (activity != null) {
+                    Intent intent = new Intent(activity, CameraActivity.class);
+                    intent.putExtra("userGid", "newUser");
+                    intent.putExtra("isRegistration", true);
+                    intent.putExtra("configurations",new Gson().toJson(getConfigurations()));
+                    activity.startActivityForResult(intent, ACHALA_SECURE_REQUEST_CODE);
+                } else {
+                    Log.e("EnrollFace", "Activity is null, cannot start CameraActivity");
+                }
+            }
+        });
+        // This method runs on the main thread, so no need for a new thread
+       /* if (activity != null) {
+            Intent intent = new Intent(activity, CameraActivity.class);
+            intent.putExtra("userGid", userGid);
+            intent.putExtra("isRegistration", true);
+            activity.startActivityForResult(intent, ACHALA_SECURE_REQUEST_CODE);
+        } else {
+            Log.e("EnrollFace", "Activity is null, cannot start CameraActivity");
+        }*/
+    }
+
+
+
+
+
+
+
 }

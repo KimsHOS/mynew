@@ -1,4 +1,4 @@
-package com.mynew.secure.utils;
+package com.example.achalasecure.utils;
 
 import static java.lang.Math.max;
 import static java.lang.Math.pow;
@@ -22,108 +22,106 @@ import org.tensorflow.lite.support.tensorbuffer.TensorBufferFloat;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.util.Arrays;
 
+// Utility class for FaceNet model
 public class FaceNetModel {
 
+    // Input image size for FaceNet model.
     private final int imgSize;
+
+    // Output embedding size
     public final int embeddingDim;
     private ModelInfo actModel;
     private Interpreter interpreter;
     private final ImageProcessor imageTensorProcessor;
 
-    public FaceNetModel(Context context, ModelInfo model, boolean useGpu, boolean useXNNPack) {
+    public FaceNetModel(Context context, ModelInfo model, boolean useGpu, boolean useXNNPack) throws InterruptedException {
+        // Input image size for FaceNet model.
         this.imgSize = model.getInputDims();
-        actModel = model;
+        actModel=model;
+        // Output embedding size
         this.embeddingDim = model.getOutputDims();
 
+        // Configure ImageProcessor for resizing and standardization
         this.imageTensorProcessor = new ImageProcessor.Builder()
                 .add(new ResizeOp(imgSize, imgSize, ResizeOp.ResizeMethod.BILINEAR))
                 .add(new StandardizeOp())
                 .build();
 
+        // Initialize TFLiteInterpreter
         Interpreter.Options interpreterOptions = new Interpreter.Options();
-        interpreterOptions.setNumThreads(4); // Default to CPU with 4 threads
-        interpreterOptions.setUseXNNPACK(useXNNPack);
 
-        // Try GPU delegate if enabled and supported
+        // Add the GPU Delegate if supported.
         if (useGpu) {
             CompatibilityList compatibilityList = new CompatibilityList();
             if (compatibilityList.isDelegateSupportedOnThisDevice()) {
-                interpreterOptions.addDelegate(new GpuDelegate(compatibilityList.getBestOptionsForThisDevice()));
-                Log.d("FaceNetModel", "Using GPU delegate");
-            } else {
-                Log.w("FaceNetModel", "GPU delegate not supported, falling back to CPU");
+                    interpreterOptions.addDelegate(new GpuDelegate(compatibilityList.getBestOptionsForThisDevice()));
             }
+        } else {
+            // Number of threads for computation
+            interpreterOptions.setNumThreads(4);
         }
 
-        // Disable NNAPI to avoid Android 11 issues
-        interpreterOptions.setUseNNAPI(false);
-
+        interpreterOptions.setUseXNNPACK(useXNNPack);
+        interpreterOptions.setUseNNAPI(true);
+        //  ExecutorService executor = Executors.newSingleThreadExecutor();
+        //  executor.submit(() -> {
         try {
-            this.interpreter = new Interpreter(
-                    FileUtil.loadMappedFile(context, model.getAssetsFilename()),
-                    interpreterOptions
-            );
-            Log.d("FaceNetModel", "Model loaded successfully: " + model.getName());
+            this.interpreter = new Interpreter(FileUtil.loadMappedFile(context, model.getAssetsFilename()), interpreterOptions);
         } catch (Exception e) {
-            Log.e("FaceNetModel", "Failed to load interpreter: " + e.getMessage(), e);
-            throw new RuntimeException("Interpreter initialization failed", e);
+            Log.d("interpreter ", "interpreteraaaa: " + e.getMessage());
+            e.printStackTrace();
         }
+        //  });
+        Log.d("Using model", "modelaa: " + model.getName());
     }
 
+    // Gets a face embedding using FaceNet.
     public float[] getFaceEmbedding(Bitmap image) {
-        TensorBuffer tensorBuffer = TensorBuffer.createFixedSize(
-                new int[]{1, imgSize, imgSize, 3}, DataType.FLOAT32);
+        TensorBuffer tensorBuffer = TensorBuffer.createFixedSize(new int[]{1, imgSize, imgSize, 3}, DataType.FLOAT32);
         ByteBuffer byteBuffer = convertBitmapToBuffer(image);
         byteBuffer.order(ByteOrder.nativeOrder());
         tensorBuffer.loadBuffer(byteBuffer);
-
-        // Log input tensor stats for debugging
-        logTensorStats("Input Tensor", tensorBuffer.getFloatArray());
-
         TensorBuffer result = runFaceNet(tensorBuffer);
-        float[] embeddings = result.getFloatArray();
-
-        // Log output embeddings for debugging
-        logTensorStats("Output Embeddings", embeddings);
-
-        return embeddings;
+        return result.getFloatArray();
     }
 
+    // Run the FaceNet model.
     private TensorBuffer runFaceNet(TensorBuffer inputs) {
         long t1 = System.currentTimeMillis();
-        TensorBuffer output = TensorBufferFloat.createFixedSize(
-                new int[]{1, embeddingDim}, DataType.FLOAT32);
+        TensorBuffer output = TensorBufferFloat.createFixedSize(new int[]{1, embeddingDim}, DataType.FLOAT32);
         interpreter.run(inputs.getBuffer(), output.getBuffer().rewind());
-        Log.i("FaceNetModel", "Inference Speed in ms: " + (System.currentTimeMillis() - t1));
+        Log.i("Performance", "Inference Speed in ms: " + (System.currentTimeMillis() - t1));
         return output;
     }
 
+    // Resize the given bitmap and convert it to a ByteBuffer
     private ByteBuffer convertBitmapToBuffer(Bitmap image) {
-        TensorImage tensorImage = imageTensorProcessor.process(TensorImage.fromBitmap(image));
-        return tensorImage.getBuffer();
+        return imageTensorProcessor.process(TensorImage.fromBitmap(image)).getBuffer();
     }
 
+    // Op to perform standardization
+    // x' = ( x - mean ) / std_dev
     public class StandardizeOp implements TensorOperator {
+
         @Override
         public TensorBuffer apply(TensorBuffer input) {
             float[] pixels = input.getFloatArray();
+
+            // Calculate mean
             float mean = calculateMean(pixels);
+
+            // Calculate standard deviation
             float std = calculateStd(pixels, mean);
             std = max(std, 1f / (float) sqrt(pixels.length));
 
-            float[] standardized = new float[pixels.length];
+            // Standardize the values
             for (int i = 0; i < pixels.length; i++) {
-                standardized[i] = (pixels[i] - mean) / std;
+                pixels[i] = (pixels[i] - mean) / std;
             }
 
             TensorBuffer output = TensorBufferFloat.createFixedSize(input.getShape(), DataType.FLOAT32);
-            output.loadArray(standardized);
-
-            // Log standardization stats
-            logTensorStats("Standardized Tensor", standardized);
-
+            output.loadArray(pixels);
             return output;
         }
 
@@ -144,11 +142,15 @@ public class FaceNetModel {
         }
     }
 
+    // Method to get the dimension of the embeddings
     public int getEmbeddingDimension() {
-        return interpreter.getOutputTensor(0).shape()[1];
+        // Assuming the output tensor contains embeddings of a fixed size
+        return interpreter.getOutputTensor(0).shape()[1];  // Assuming the embedding dimension is at index 1
     }
 
+    // Method to get the loaded TFLite model interpreter
     public ModelInfo getModel() {
+
         return actModel;
     }
 
@@ -158,28 +160,5 @@ public class FaceNetModel {
 
     public void setInterpreter(Interpreter interpreter) {
         this.interpreter = interpreter;
-    }
-
-    private void logTensorStats(String tag, float[] array) {
-        float mean = calculateMean(array);
-        float std = calculateStd(array, mean);
-        Log.d("FaceNetModel", String.format("%s: Mean=%.4f, Std=%.4f, First few values=%s",
-                tag, mean, std, Arrays.toString(Arrays.copyOf(array, Math.min(5, array.length)))));
-    }
-
-    private float calculateMean(float[] array) {
-        float sum = 0;
-        for (float value : array) {
-            sum += value;
-        }
-        return sum / array.length;
-    }
-
-    private float calculateStd(float[] array, float mean) {
-        float sum = 0;
-        for (float value : array) {
-            sum += pow(value - mean, 2);
-        }
-        return (float) sqrt(sum / array.length);
     }
 }
