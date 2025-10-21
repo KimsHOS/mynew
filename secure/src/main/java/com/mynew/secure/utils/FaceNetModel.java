@@ -8,8 +8,6 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.util.Log;
 
-import com.google.gson.Gson;
-
 import org.tensorflow.lite.DataType;
 import org.tensorflow.lite.Interpreter;
 import org.tensorflow.lite.gpu.CompatibilityList;
@@ -88,8 +86,6 @@ public class FaceNetModel {
         float[] embeddings = result.getFloatArray();
 
         // Log output embeddings for debugging
-
-        String s = new Gson().toJson(embeddings);
         logTensorStats("Output Embeddings", embeddings);
 
         return embeddings;

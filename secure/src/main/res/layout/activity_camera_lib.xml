@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -11,33 +11,14 @@
         android:id="@+id/preview_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:fitsSystemWindows="false"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <!-- Face Guide Overlay -->
-    <com.mynew.secure.utils.FaceOverlayView
-        android:id="@+id/face_overlay_view"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="0dp"
-        android:layout_marginBottom="0dp"
-        app:layout_constraintBottom_toTopOf="@id/bottom_container"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/header" />
+        android:fitsSystemWindows="false" />
 
     <!-- Top Bar -->
     <LinearLayout
         android:id="@+id/header"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        android:orientation="vertical">
 
         <!-- Status Bar Height Padding -->
         <View
@@ -66,6 +47,7 @@
                 android:id="@+id/close_camera"
                 android:layout_width="42dp"
                 android:layout_height="42dp"
+
                 android:background="@drawable/modern_button_bg"
                 android:contentDescription="@string/close_camera_description"
                 android:padding="10dp"
@@ -73,109 +55,62 @@
         </RelativeLayout>
     </LinearLayout>
 
+    <!-- Face Guide Circle -->
+    <ImageView
+        android:layout_width="280dp"
+        android:layout_height="280dp"
+        android:visibility="gone"
+        android:layout_centerInParent="true"
+        android:src="@drawable/white_face_guide" />
+
     <!-- User Instructions -->
     <TextView
         android:id="@+id/to_user"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="24dp"
-        android:layout_marginBottom="32dp"
-        android:text="Please position your face within the oval"
+        android:layout_margin="20dp"
+        android:layout_centerHorizontal="true"
+        android:layout_above="@id/bottom_container"
+        android:layout_marginBottom="48dp"
+        android:text="Please look into the camera"
         android:textColor="#FFFFFF"
-        android:textSize="18sp"
+        android:textSize="22sp"
+        android:gravity="center"
         android:fontFamily="sans-serif-medium"
         android:letterSpacing="0.02"
-        android:shadowColor="#80000000"
+        android:shadowColor="#C3000000"
         android:shadowDx="0"
         android:shadowDy="2"
-        android:shadowRadius="6"
-        android:textAlignment="center"
-        android:gravity="center"
-        android:background="@drawable/instruction_background"
-        android:padding="16dp"
-        app:layout_constraintBottom_toTopOf="@id/bottom_container"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        android:shadowRadius="4" />
 
-    <!-- Progress Indicator (Hidden by default) -->
-    <LinearLayout
-        android:id="@+id/progress_indicator"
+    <TextView
+        android:id="@+id/spoof_tv"
+        android:visibility="gone"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center"
-        android:visibility="gone"
-        android:background="@drawable/progress_background"
-        android:padding="16dp"
-        android:layout_marginBottom="16dp"
-        app:layout_constraintBottom_toTopOf="@id/to_user"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        android:layout_centerHorizontal="true"
+        android:layout_above="@id/bottom_container"
+        android:layout_marginBottom="18dp"
+        android:text="score"
+        android:textColor="#FFFFFF"
+        android:textSize="12sp"
+        android:fontFamily="sans-serif-medium"
+        android:letterSpacing="0.02"
+        android:shadowColor="#C3000000"
+        android:shadowDx="0"
+        android:shadowDy="2"
+        android:shadowRadius="4" />
 
-        <ProgressBar
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_marginEnd="12dp"
-            android:indeterminateTint="#FFFFFF" />
-
-        <TextView
-            android:id="@+id/progress_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Processing..."
-            android:textColor="#FFFFFF"
-            android:textSize="16sp"
-            android:fontFamily="sans-serif-medium" />
-    </LinearLayout>
-
-    <!-- Authentication Steps Indicator -->
-    <LinearLayout
-        android:id="@+id/steps_indicator"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center"
-        android:background="@drawable/steps_background"
-        android:padding="12dp"
-        android:layout_marginTop="16dp"
-        android:visibility="gone"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/header">
-
-        <View
-            android:id="@+id/step1_indicator"
-            android:layout_width="8dp"
-            android:layout_height="8dp"
-            android:layout_marginHorizontal="4dp"
-            android:background="@drawable/step_indicator_active" />
-
-        <View
-            android:id="@+id/step2_indicator"
-            android:layout_width="8dp"
-            android:layout_height="8dp"
-            android:layout_marginHorizontal="4dp"
-            android:background="@drawable/step_indicator_inactive" />
-
-        <View
-            android:id="@+id/step3_indicator"
-            android:layout_width="8dp"
-            android:layout_height="8dp"
-            android:layout_marginHorizontal="4dp"
-            android:background="@drawable/step_indicator_inactive" />
-    </LinearLayout>
 
     <!-- Bottom Container with Black Background -->
     <LinearLayout
         android:id="@+id/bottom_container"
-        android:layout_width="0dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
         android:background="#3BFBFBFB"
         android:orientation="horizontal"
-        android:padding="16dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        android:padding="16dp">
 
         <TextView
             android:layout_width="0dp"
@@ -201,13 +136,12 @@
         android:id="@+id/live_detection"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
         android:visibility="gone"
+        android:layout_centerHorizontal="true"
+        android:layout_above="@id/to_user"
+        android:layout_marginBottom="8dp"
         android:textColor="#69F0AE"
         android:textSize="16sp"
-        android:fontFamily="sans-serif-medium"
-        app:layout_constraintBottom_toTopOf="@id/to_user"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        android:fontFamily="sans-serif-medium" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</RelativeLayout>

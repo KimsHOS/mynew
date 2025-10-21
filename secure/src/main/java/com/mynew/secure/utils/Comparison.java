@@ -4,7 +4,6 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.RectF;
 import android.speech.tts.TextToSpeech;
-import android.util.Base64;
 import android.util.Log;
 import android.util.Pair;
 
@@ -19,7 +18,6 @@ import com.google.mlkit.vision.face.FaceDetection;
 import com.google.mlkit.vision.face.FaceDetector;
 import com.google.mlkit.vision.face.FaceDetectorOptions;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -131,7 +129,6 @@ public class Comparison {
 
                 Bitmap croppedBitmap = BitmapUtils.cropRectFromBitmap(cameraFrameBitmap, new RectF(face.getBoundingBox()));
                 Log.d("cropping","is ok");
-                String base64  = bitmapToBase64(croppedBitmap);
                 subject = model.getFaceEmbedding(croppedBitmap);
 
 //                String maskLabel = "";
@@ -265,15 +262,5 @@ public class Comparison {
 
     private double average(ArrayList<Float> list) {
         return list.stream().mapToDouble(Float::doubleValue).average().orElse(0.0);
-    }
-    public static String bitmapToBase64(Bitmap bitmap) {
-        if (bitmap == null) {
-            return "";
-        }
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        // Compress to JPEG (change format if needed)
-        bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
-        byte[] byteArray = byteArrayOutputStream.toByteArray();
-        return Base64.encodeToString(byteArray, Base64.NO_WRAP); // NO_WRAP avoids \n in output
     }
 }
